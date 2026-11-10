@@ -1,13 +1,13 @@
 {
   "dataset": {
     "repo_id": "lerobot/libero",
-    "revision": null,
+    "revision": "a1aaacb7f6cd6ee5fb43120f673cebb0cfea7dd4",
     "video_backend": "pyav",
     "suite": "libero_object"
   },
   "model": {
     "repo_id": "lerobot/smolvla_base",
-    "revision": null
+    "revision": "5e8d12a6e2975b0e5e5fce7c8caf47c371d257b6"
   },
   "training": {
     "seed": 42,

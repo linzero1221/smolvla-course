@@ -7,11 +7,15 @@
 - [实验配置](configs/experiment.json)保存物体、改写指令、初始状态划分和首轮训练参数。
 - [仿真检查脚本](scripts/smoke_eval.sh)使用公开的 LIBERO 权重执行一个闭环仿真回合，并保存日志与评测输出。
 
-当前是项目初始化阶段。正式数据准备、训练、评估与报告按计划实施。本机检测到 RTX 5060 8 GB，仿真脚本需要 Linux GPU 环境，尚未在本机跑过闭环。
+本机已安装 WSL2 和 Ubuntu 24.04，并在 Ubuntu 中通过 RTX 5060 的 CUDA 驱动检查。首个 LIBERO 单回合仿真待验收，以实际生成的评测 JSON 和回放为准。
 
 ## 第一次运行
 
 在装有 NVIDIA 驱动的 Linux GPU 主机或支持 GPU 的 WSL2 发行版中执行。以下以 Python 3.12 和 LeRobot 0.6.1 为起始版本。准备约 30 GB 工作空间。若使用 WSL2，建议把项目和模型缓存放在 Linux 文件系统。
+
+Windows 用户使用 WSL2 时，按专门的步骤安装 Ubuntu、配置 CUDA 版 PyTorch 并执行首个回合。D 盘安装位置和作业完成后的清理步骤也记录在同一份文档中。[WSL2 安装与卸载说明](docs/WSL_SETUP.md)
+
+以下是已有 Linux GPU 主机的 Conda 入口。
 
 ```bash
 conda create -y -n smolvla-course python=3.12
@@ -33,7 +37,8 @@ VLA/
 ├── configs/
 │   └── experiment.json
 ├── docs/
-│   └── PROJECT_PLAN.md
+│   ├── PROJECT_PLAN.md
+│   └── WSL_SETUP.md
 ├── scripts/
 │   └── smoke_eval.sh       # 已提供的环境检查入口
 ├── data/                  # 本地数据、物体审计与数据划分清单

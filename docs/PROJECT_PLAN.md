@@ -16,17 +16,30 @@
 
 ## 2. 环境与首日验收
 
-1. 按 [README](../README.md) 创建 Python 3.12 环境，验证 `nvidia-smi`、CUDA 张量和 LeRobot CLI。Windows 本机已检测到 RTX 5060 8 GB。可用 Linux GPU 主机优先于在课程项目中现场调试 WSL 渲染。
+1. 创建 Python 3.12 环境，验证 `nvidia-smi`、CUDA 张量和 LeRobot CLI。本机的 Ubuntu 24.04 已在 WSL2 中通过 CUDA 驱动检查。按所用环境选择步骤。[Linux GPU 安装入口](../README.md#第一次运行) · [WSL2 安装与验收](WSL_SETUP.md)
 2. 执行 `bash scripts/smoke_eval.sh`。它用公开的 `lerobot/smolvla_libero` 权重跑一个原版 LIBERO-Object 回合。检查两路相机画面、机械臂运动、评测 JSON 和 MP4。在 `deliverables/evidence/` 保存一张包含环境与成功执行回合的截图。
 3. 将 `nvidia-smi`、`python --version`、`python -m pip freeze`、安装命令和运行时间保存到 `outputs/environment/`。记录 LeRobot、MuJoCo、robosuite、`hf-libero` 版本。解析基础模型、数据集和环境资源的 revision，填入实验配置或环境记录。
 4. 若 CUDA 张量失败，按固定版本安装文档检查 Blackwell 对应的 PyTorch CUDA 构建。若 CUDA 正常而 EGL 初始化失败，在 Linux 上测试 `MUJOCO_GL=osmesa bash scripts/smoke_eval.sh`，需已有可用的 OSMesa 库。若半天仍无法生成回放，切到可用的 Linux GPU 主机，保留失败日志。 [LeRobot 安装说明](https://huggingface.co/docs/lerobot/v0.6.1/en/installation) · [LIBERO 环境说明](https://huggingface.co/docs/lerobot/v0.6.1/en/libero)
 
 ## 3. 数据准备与物体划分
 
-使用 [`lerobot/libero`](https://huggingface.co/datasets/lerobot/libero) 视频版，主实验只读取原版 LIBERO-Object 中匹配的任务。配置中的 `revision: null` 表示第 1 天待填的值。运行以下命令分别取得数据与模型的 Hub commit SHA，保存到配置，并按各自的 SHA 下载。 [数据格式与版本说明](https://huggingface.co/docs/lerobot/v0.6.1/en/libero)
+主实验使用 `lerobot/libero` 视频版，只读取原版 LIBERO-Object 中匹配的任务。实验配置已记录数据集和基础模型的 Hub commit SHA，复现时按配置中的版本下载。需要核对这些版本是否仍可访问时，运行以下命令。[实验配置](../configs/experiment.json) · [LIBERO 数据格式与版本说明](https://huggingface.co/docs/lerobot/v0.6.1/en/libero)
 
 ```bash
-python -c 'from huggingface_hub import HfApi; api = HfApi(); print("dataset", api.dataset_info("lerobot/libero").sha); print("model", api.model_info("lerobot/smolvla_base").sha)'
+python - <<'PY'
+import json
+from pathlib import Path
+
+from huggingface_hub import HfApi
+
+config = json.loads(Path("configs/experiment.json").read_text(encoding="utf-8"))
+api = HfApi()
+for name, lookup in (("dataset", api.dataset_info), ("model", api.model_info)):
+    entry = config[name]
+    info = lookup(entry["repo_id"], revision=entry["revision"])
+    assert info.sha == entry["revision"], (name, info.sha)
+    print(name, info.sha)
+PY
 ```
 
 | 集合 | 目标物体 | 用法 |

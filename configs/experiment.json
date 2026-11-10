@@ -1,0 +1,74 @@
+{
+  "dataset": {
+    "repo_id": "lerobot/libero",
+    "revision": null,
+    "video_backend": "pyav",
+    "suite": "libero_object"
+  },
+  "model": {
+    "repo_id": "lerobot/smolvla_base",
+    "revision": null
+  },
+  "training": {
+    "seed": 42,
+    "method": "LORA",
+    "rank": 32,
+    "alpha": 64,
+    "learning_rate": 0.001,
+    "final_learning_rate": 0.0001,
+    "batch_size": 1,
+    "pilot_steps": 200,
+    "formal_steps": 20000,
+    "warmup_steps": 500,
+    "save_every_steps": 5000,
+    "log_every_steps": 50
+  },
+  "evaluation": {
+    "seed": 42,
+    "batch_size": 1,
+    "control_mode": "relative",
+    "observation_size": [256, 256],
+    "n_action_steps": 10,
+    "hard_reset": true,
+    "validation_init_state_ids": [0, 1, 2, 3, 4],
+    "test_init_state_ids": [5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+  },
+  "tasks": {
+    "seen": [
+      {
+        "object": "alphabet_soup",
+        "bddl_stem": "pick_up_the_alphabet_soup_and_place_it_in_the_basket",
+        "paraphrases": [
+          "Grab the alphabet soup and put it in the basket.",
+          "Put the alphabet soup into the basket after lifting it."
+        ]
+      },
+      {
+        "object": "cream_cheese",
+        "bddl_stem": "pick_up_the_cream_cheese_and_place_it_in_the_basket",
+        "paraphrases": [
+          "Grab the cream cheese and put it in the basket.",
+          "Put the cream cheese into the basket after lifting it."
+        ]
+      },
+      {
+        "object": "salad_dressing",
+        "bddl_stem": "pick_up_the_salad_dressing_and_place_it_in_the_basket",
+        "paraphrases": [
+          "Grab the salad dressing and put it in the basket.",
+          "Put the salad dressing into the basket after lifting it."
+        ]
+      }
+    ],
+    "unseen": [
+      {
+        "object": "bbq_sauce",
+        "bddl_stem": "pick_up_the_bbq_sauce_and_place_it_in_the_basket"
+      },
+      {
+        "object": "chocolate_pudding",
+        "bddl_stem": "pick_up_the_chocolate_pudding_and_place_it_in_the_basket"
+      }
+    ]
+  }
+}

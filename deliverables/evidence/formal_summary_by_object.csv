@@ -1,0 +1,9 @@
+condition,object,successes,episodes,success_rate
+seen_original,alphabet_soup,2,10,0.2
+seen_original,cream_cheese,5,10,0.5
+seen_original,salad_dressing,9,10,0.9
+seen_paraphrase,alphabet_soup,4,20,0.2
+seen_paraphrase,cream_cheese,7,20,0.35
+seen_paraphrase,salad_dressing,8,20,0.4
+unseen_original,bbq_sauce,1,10,0.1
+unseen_original,chocolate_pudding,0,10,0.0

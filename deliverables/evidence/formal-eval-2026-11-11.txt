@@ -1,0 +1,48 @@
+Formal evaluation record — 110 episodes
+Date: 2026-11-11 (Asia/Shanghai)
+Checkpoint: outputs/train/formal_s42_resume/checkpoints/020000
+  (LoRA r=32 alpha=64 adapter, step 20,000, selected on validation)
+Command: scripts/evaluate.py --checkpoint ... --output-dir outputs/eval/formal
+Output: outputs/eval/formal/formal_s42_resume_020000/
+
+Checkpoint selection (validation init states 0-4, original prompts, 3 tasks = 15 episodes):
+  005000           0/15  (0%)
+  010000           1/15  (6.7%)
+  015000           2/15  (13.3%)
+  020000           9/15  (60.0%)   <- selected, no tie
+  per object at 020000: alphabet_soup 1/5, cream_cheese 3/5, salad_dressing 5/5
+
+Formal results (test init states 5-14, 10 per task):
+  condition          successes / episodes   success rate
+  seen_original      16 / 30                53.3%
+  seen_paraphrase    19 / 60                31.7%
+  unseen_original     1 / 20                 5.0%
+  all statuses: 36 ok, 74 timeout, 0 error
+
+Per object:
+  seen_original    alphabet_soup 2/10 (20%), cream_cheese 5/10 (50%), salad_dressing 9/10 (90%)
+  seen_paraphrase  alphabet_soup 4/20 (20%), cream_cheese 7/20 (35%), salad_dressing 8/20 (40%)
+  unseen_original  bbq_sauce 1/10 (10%), chocolate_pudding 0/10 (0%)
+
+Language pairing (each paraphrase vs the same task/init state/seed original):
+  20 pairs success -> failure, 7 pairs failure -> success, 33 unchanged (60 pairs)
+  paraphrase_1: 12/30 success; paraphrase_2: 7/30 success
+  original on the same 30 task-state pairs: 15/30
+  net effect: -8 successes out of 30 paired states (53.3% -> 31.7% at condition level)
+
+Artifacts:
+  outputs/eval/formal/formal_s42_resume_020000/episodes.csv        (110 rows)
+  outputs/eval/formal/formal_s42_resume_020000/summary.csv
+  outputs/eval/formal/formal_s42_resume_020000/summary_by_object.csv
+  outputs/eval/formal/formal_s42_resume_020000/language_pairs.csv
+  outputs/eval/formal/formal_s42_resume_020000/success_by_condition.png
+  outputs/eval/formal/formal_s42_resume_020000/training_loss.png
+  outputs/eval/formal/formal_s42_resume_020000/videos/*.mp4        (110 replays)
+  outputs/eval/validation/*/episodes.csv                          (4 x 15 validation)
+
+Notes:
+- Success is decided by the LIBERO environment predicate; prompts never affect it.
+- Timeouts count as failures, as required by the plan.
+- All 110 episode keys are unique and every episode finished with status ok/timeout
+  (no errors), so no episode needs a rerun.
+- The unseen result applies only to objects absent from this project's fine-tuning data.

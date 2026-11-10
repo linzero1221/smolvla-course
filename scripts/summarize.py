@@ -221,10 +221,12 @@ def main() -> int:
             f"{row['success_rate']:.1%} |"
         )
     if pairs:
-        improved = sum(1 for pair in pairs if pair["delta"] > 0)
+        # delta = paraphrase - original; negative means the paraphrase lost a
+        # success that the original prompt achieved.
         degraded = sum(1 for pair in pairs if pair["delta"] < 0)
+        improved = sum(1 for pair in pairs if pair["delta"] > 0)
         lines.append("")
-        lines.append(f"Paired paraphrase outcomes: {improved} success->failure, {degraded} failure->success, "
+        lines.append(f"Paired paraphrase outcomes: {degraded} success->failure, {improved} failure->success, "
                      f"{len(pairs) - improved - degraded} unchanged out of {len(pairs)} pairs.")
     (output_dir / "summary.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 

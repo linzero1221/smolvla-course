@@ -1,0 +1,27 @@
+Formal training run (20k steps) — paused record
+Date: 2026-11-11 (Asia/Shanghai) / 2026-11-10 11:57 UTC
+Status: PAUSED BY USER at ~11,300 / 20,000 steps (56%)
+Command: bash scripts/train.sh formal
+Output: outputs/train/formal_s42 (35 MB so far)
+Console log: outputs/train/formal_s42.log (816 KB)
+Dataset: data/libero_object_train (136 episodes / 19445 frames / 3 tasks)
+Base: lerobot/smolvla_base @ 5e8d12a6e2975b0e5e5fce7c8caf47c371d257b6
+Config: LoRA r=32 alpha=64, batch 1, lr 1e-3 -> 1e-4, warmup 500, decay 20000, seed 42
+
+Progress:
+- Reached step ~11,300 of 20,000 in ~21 minutes (~8 step/s)
+- Loss trajectory: 2.2 at step 50 -> 0.75 at step 7k -> ~0.65 at step 12k
+- GPU memory during training: 1.09 GB (torch allocated)
+- Checkpoints saved before pause: 005000, 010000 (last -> 010000)
+- No 015000 or 020000 checkpoint was written yet
+
+Resume options:
+1. Continue from the last checkpoint with lerobot-train --resume / --config_path
+   pointing at outputs/train/formal_s42/checkpoints/010000/pretrained_model,
+   with a NEW output directory (see PROJECT_PLAN section 4).
+2. Restart the 20k run from scratch (outputs/train/formal_s42 must be moved away
+   first; train.sh refuses to overwrite an existing run directory).
+3. Evaluate the 005000 and 010000 checkpoints as interim candidates using
+   scripts/evaluate.py --validation.
+
+Processes: no lerobot-train / lerobot-eval processes remain; GPU memory released.

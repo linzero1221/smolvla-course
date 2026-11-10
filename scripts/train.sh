@@ -4,20 +4,27 @@
 # Usage:
 #   bash scripts/train.sh pilot     # 200-step trial run  -> outputs/train/pilot_s42
 #   bash scripts/train.sh formal    # 20k-step full run    -> outputs/train/formal_s42
+#   bash scripts/train.sh resume <checkpoint_dir> <output_dir>
+#                                   # continue a paused run from a checkpoint
 #
-# Both modes read sizes and hyper-parameters from configs/experiment.json so the
-# script and the experiment config cannot drift. The base weights are resolved
-# from the pinned revision recorded in the config.
+# The three modes read sizes and hyper-parameters from configs/experiment.json
+# (resume reads them from the checkpoint's train_config.json) so the script and
+# the experiment config cannot drift. The base weights are resolved from the
+# pinned revision recorded in the config.
 set -euo pipefail
 
 mode="${1:-}"
 case "$mode" in
-    pilot|formal) ;;
+    pilot|formal|resume) ;;
     *)
-        printf 'Usage: %s {pilot|formal}\n' "$0" >&2
+        printf 'Usage: %s {pilot|formal|resume <checkpoint_dir> <output_dir>}\n' "$0" >&2
         exit 2
         ;;
 esac
+if [[ "$mode" == "resume" && $# -ne 3 ]]; then
+    printf 'Usage: %s resume <checkpoint_dir> <output_dir>\n' "$0" >&2
+    exit 2
+fi
 
 if [[ $(uname -s) != Linux ]]; then
     printf '%s\n' 'Run this script on a Linux GPU host or inside WSL2.' >&2
@@ -56,12 +63,28 @@ if [[ "$mode" == pilot ]]; then
     warmup="$((steps / 10))"
     decay_steps="$steps"
     output_dir="outputs/train/pilot_s${seed}"
-else
+elif [[ "$mode" == formal ]]; then
     steps="$(read_cfg training.formal_steps)"
     save_freq="$(read_cfg training.save_every_steps)"
     warmup="$(read_cfg training.warmup_steps)"
     decay_steps="$steps"
     output_dir="outputs/train/formal_s${seed}"
+else
+    # resume: <checkpoint_dir> <output_dir>
+    resume_checkpoint="${2%/}"
+    output_dir="${3%/}"
+    resume_config="$resume_checkpoint/pretrained_model/train_config.json"
+    if [[ ! -f "$resume_config" ]]; then
+        printf 'No train_config.json under %s/pretrained_model\n' "$resume_checkpoint" >&2
+        exit 1
+    fi
+    # Sizes and hyper-parameters come from the checkpoint itself; only the new
+    # output directory is overridden so the paused run is not overwritten.
+    steps="$(python3 - "$resume_config" <<'PY'
+import json, sys
+print(json.load(open(sys.argv[1], encoding="utf-8"))["steps"])
+PY
+)"
 fi
 
 if [[ -e "$output_dir" ]]; then
@@ -94,31 +117,40 @@ fi
 # directory is created by it; the console log lives next to it.
 log_file="${output_dir}.log"
 
-lerobot-train \
-    --policy.path="$base_model_dir" \
-    --policy.device=cuda \
-    --policy.push_to_hub=false \
-    --policy.input_features=null \
-    --policy.output_features=null \
-    --policy.optimizer_lr="$(read_cfg training.learning_rate)" \
-    --policy.scheduler_decay_lr="$(read_cfg training.final_learning_rate)" \
-    --policy.scheduler_warmup_steps="$warmup" \
-    --policy.scheduler_decay_steps="$decay_steps" \
-    --dataset.repo_id="$train_repo_id" \
-    --dataset.root="$dataset_root" \
-    --dataset.video_backend="$(read_cfg dataset.video_backend)" \
-    --dataset.use_imagenet_stats=false \
-    --peft.method_type="$(read_cfg training.method)" \
-    --peft.r="$rank" \
-    --peft.lora_alpha="$alpha" \
-    --steps="$steps" \
-    --batch_size="$batch_size" \
-    --seed="$seed" \
-    --env_eval_freq=0 \
-    --save_freq="$save_freq" \
-    --log_freq="$log_freq" \
-    --num_workers=2 \
-    --wandb.enable=false \
-    --output_dir="$output_dir" 2>&1 | tee "$log_file"
+if [[ "$mode" == resume ]]; then
+    # The checkpoint's train_config.json is authoritative for step count,
+    # optimizer/scheduler state and data order; pass it via --config_path.
+    lerobot-train \
+        --config_path="$resume_config" \
+        --resume=true \
+        --output_dir="$output_dir" 2>&1 | tee "$log_file"
+else
+    lerobot-train \
+        --policy.path="$base_model_dir" \
+        --policy.device=cuda \
+        --policy.push_to_hub=false \
+        --policy.input_features=null \
+        --policy.output_features=null \
+        --policy.optimizer_lr="$(read_cfg training.learning_rate)" \
+        --policy.scheduler_decay_lr="$(read_cfg training.final_learning_rate)" \
+        --policy.scheduler_warmup_steps="$warmup" \
+        --policy.scheduler_decay_steps="$decay_steps" \
+        --dataset.repo_id="$train_repo_id" \
+        --dataset.root="$dataset_root" \
+        --dataset.video_backend="$(read_cfg dataset.video_backend)" \
+        --dataset.use_imagenet_stats=false \
+        --peft.method_type="$(read_cfg training.method)" \
+        --peft.r="$rank" \
+        --peft.lora_alpha="$alpha" \
+        --steps="$steps" \
+        --batch_size="$batch_size" \
+        --seed="$seed" \
+        --env_eval_freq=0 \
+        --save_freq="$save_freq" \
+        --log_freq="$log_freq" \
+        --num_workers=2 \
+        --wandb.enable=false \
+        --output_dir="$output_dir" 2>&1 | tee "$log_file"
+fi
 
 printf '\nRun finished: %s\n' "$output_dir"

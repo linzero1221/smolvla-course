@@ -1,0 +1,49 @@
+Formal training record (20,000 steps)
+Date: 2026-11-11 (Asia/Shanghai)
+Status: COMPLETED
+
+Commands:
+  bash scripts/train.sh formal
+      -> stopped on request at ~11,300 steps (see formal-train-paused-2026-11-10.txt)
+  bash scripts/train.sh resume \
+        outputs/train/formal_s42/checkpoints/010000 \
+        outputs/train/formal_s42_resume
+      -> continued from step 10,000 to 20,000
+
+Dataset: data/libero_object_train (136 episodes / 19,445 frames / 3 tasks)
+Base: lerobot/smolvla_base @ 5e8d12a6e2975b0e5e5fce7c8caf47c371d257b6
+Config: LoRA r=32 alpha=64, batch 1, lr 1e-3 -> 1e-4, warmup 500,
+        decay 20,000 steps, seed 42, save every 5,000, log every 50
+
+Checkpoints (adapter + normalisation processors each, ~6 MB adapter):
+  outputs/train/formal_s42/checkpoints/005000
+  outputs/train/formal_s42/checkpoints/010000
+  outputs/train/formal_s42_resume/checkpoints/015000
+  outputs/train/formal_s42_resume/checkpoints/020000   (checkpoints/last -> 020000)
+
+Loss trajectory (evaluation every 50 steps, logged every 1,000 below):
+  step    50: 2.2
+  step  1000: ~1.0
+  step  2000: ~0.90
+  step  5000: ~0.87
+  step  7000: ~0.75
+  step 10000: ~0.70 (logged 0.640-0.665 range in the first run)
+  step 12000: 0.656
+  step 15000: 0.52
+  step 18000: 0.570
+  step 20000: 0.503
+Full curve: outputs/train/formal_s42_resume/loss_full.png
+CSV:        outputs/train/formal_s42_resume/training_log_full.csv (39 rows, steps 50-20000)
+
+Timing / memory:
+- first segment: ~11,300 steps in ~21 min at ~8.5 step/s
+- resumed segment: 10,000 steps in 19 min 57 s at 8.35 step/s
+- torch-allocated training memory: 1.09 GB throughout (8 GB card)
+- total wall clock: ~41 min of training across both segments
+
+Resume semantics verified:
+- resumed log starts at step:10K with lr 5.5e-04, matching the saved scheduler state
+  (last_epoch 10000), and the data order resumed at epoch 0, sample 10000
+- progress bar counts the remaining 10,000 steps; logged steps are global (10K..20K)
+
+Note: no evaluation, checkpoint selection or summarisation was started.

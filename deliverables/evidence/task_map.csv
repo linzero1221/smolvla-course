@@ -1,0 +1,11 @@
+bddl_stem,object,split,sim_task_id,sim_language,dataset_task_index,dataset_task_text,n_init_states,n_episodes,n_frames
+pick_up_the_alphabet_soup_and_place_it_in_the_basket,alphabet_soup,seen,0,pick up the alphabet soup and place it in the basket,24,pick up the alphabet soup and place it in the basket,50,44,6867
+pick_up_the_cream_cheese_and_place_it_in_the_basket,cream_cheese,seen,1,pick up the cream cheese and place it in the basket,22,pick up the cream cheese and place it in the basket,50,45,6378
+pick_up_the_salad_dressing_and_place_it_in_the_basket,salad_dressing,seen,2,pick up the salad dressing and place it in the basket,26,pick up the salad dressing and place it in the basket,50,47,6200
+pick_up_the_bbq_sauce_and_place_it_in_the_basket,bbq_sauce,unseen,3,pick up the bbq sauce and place it in the basket,23,pick up the bbq sauce and place it in the basket,50,46,6723
+pick_up_the_ketchup_and_place_it_in_the_basket,ketchup,other,4,pick up the ketchup and place it in the basket,21,pick up the ketchup and place it in the basket,50,45,6919
+pick_up_the_tomato_sauce_and_place_it_in_the_basket,tomato_sauce,other,5,pick up the tomato sauce and place it in the basket,28,pick up the tomato sauce and place it in the basket,50,42,6097
+pick_up_the_butter_and_place_it_in_the_basket,butter,other,6,pick up the butter and place it in the basket,27,pick up the butter and place it in the basket,50,45,7102
+pick_up_the_milk_and_place_it_in_the_basket,milk,other,7,pick up the milk and place it in the basket,25,pick up the milk and place it in the basket,50,45,6443
+pick_up_the_chocolate_pudding_and_place_it_in_the_basket,chocolate_pudding,unseen,8,pick up the chocolate pudding and place it in the basket,29,pick up the chocolate pudding and place it in the basket,50,50,7964
+pick_up_the_orange_juice_and_place_it_in_the_basket,orange_juice,other,9,pick up the orange juice and place it in the basket,20,pick up the orange juice and place it in the basket,50,45,6291

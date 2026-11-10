@@ -1,0 +1,36 @@
+Data preparation record
+Date: 2026-11-10
+Dataset: lerobot/libero @ a1aaacb7f6cd6ee5fb43120f673cebb0cfea7dd4
+Simulator suite: LIBERO-Object, 10 BDDL tasks, 50 init states per task
+Task mapping: simulator task_id 0-9 -> dataset task_index
+  0 alphabet_soup      -> 24
+  1 cream_cheese       -> 22
+  2 salad_dressing     -> 26
+  3 bbq_sauce          -> 23 (unseen)
+  4 ketchup            -> 21
+  5 tomato_sauce       -> 28
+  6 butter             -> 27
+  7 milk               -> 25
+  8 chocolate_pudding  -> 29 (unseen)
+  9 orange_juice       -> 20
+
+Training subset: 136 episodes / 19445 frames / 3 tasks
+  alphabet_soup  44 episodes  6867 frames
+  cream_cheese   45 episodes  6378 frames
+  salad_dressing 47 episodes  6200 frames
+
+Object audit: none of the 3 training BDDL scenes contains bbq_sauce or chocolate_pudding.
+  Both held-out objects appear only in scenes of other tasks (ketchup, tomato_sauce,
+  butter, milk, orange_juice and the two held-out tasks themselves).
+
+Data columns: observation.images.image (agentview), observation.images.image2 (wrist),
+  observation.state 8-d, action 7-d, task text, 10 fps.
+Camera order checked visually: image = third-person agentview, image2 = wrist camera.
+
+Exported dataset: data/libero_object_train (149 MB), meta/stats.json recomputed from the
+  136 kept episodes only; action/state count = 19445.
+
+Note: LeRobot 0.6.1 delete_episodes expects meta/episodes chunk/file index and per-episode
+  task columns absent from lerobot/libero; prepare_data.py adds them in memory before export.
+Environment note: torchcodec fails to load (libnppicc.so.12 missing) and LeRobot falls back
+  to pyav; training config already sets dataset.video_backend=pyav.

@@ -1,0 +1,20 @@
+{
+  "dataset": "lerobot/libero",
+  "revision": "a1aaacb7f6cd6ee5fb43120f673cebb0cfea7dd4",
+  "total_episodes": 1693,
+  "train_episodes": 136,
+  "train_frames": 19445,
+  "tasks": {
+    "pick_up_the_alphabet_soup_and_place_it_in_the_basket": "seen",
+    "pick_up_the_cream_cheese_and_place_it_in_the_basket": "seen",
+    "pick_up_the_salad_dressing_and_place_it_in_the_basket": "seen",
+    "pick_up_the_bbq_sauce_and_place_it_in_the_basket": "unseen",
+    "pick_up_the_ketchup_and_place_it_in_the_basket": "other",
+    "pick_up_the_tomato_sauce_and_place_it_in_the_basket": "other",
+    "pick_up_the_butter_and_place_it_in_the_basket": "other",
+    "pick_up_the_milk_and_place_it_in_the_basket": "other",
+    "pick_up_the_chocolate_pudding_and_place_it_in_the_basket": "unseen",
+    "pick_up_the_orange_juice_and_place_it_in_the_basket": "other"
+  },
+  "min_init_states": 50
+}

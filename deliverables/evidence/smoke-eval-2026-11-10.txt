@@ -1,0 +1,17 @@
+LIBERO single-episode smoke test (first pass)
+Date: 2026-11-10 (Asia/Shanghai)
+Host: WSL2 Ubuntu 24.04.5 LTS, Python 3.12.3, venv ~/.venvs/smolvla-course
+GPU: NVIDIA GeForce RTX 5060, 8151 MiB, driver 610.88
+Git HEAD: a29c567c0720e8bf0c3d5ac520df8860855dcf83 (codex/lin-wsl-setup)
+Command: bash scripts/smoke_eval.sh (MUJOCO_GL=egl, HF_ENDPOINT=https://hf-mirror.com, HF_HUB_OFFLINE=1)
+Output: outputs/smoke/20261110T080108Z-355
+Policy: lerobot/smolvla_libero @ a24f1f380461b665158d52acd140152c79e8b36d
+Env: libero_object task_id 0, control_mode relative, obs 256x256, n_action_steps 10, seed 42
+Result: 1 episode, 280 steps, 35.76 s, success=false, sum_reward 0.0
+Video: outputs/smoke/20261110T080108Z-355/videos/libero_object_0/eval_episode_0.mp4 (256x256, 280 frames)
+Acceptance: closed-loop rollout completed with dual-camera RGB, robot motion and a replay MP4.
+Notes:
+- First invocation stopped at the LIBERO dataset-path prompt; answered "n" once to create ~/.libero/config.yaml.
+- Full LIBERO assets (586 files, lerobot/libero-assets @ 0b3ea86b) pre-downloaded to the HF cache to avoid hub 429 retries.
+- SmolVLM2-500M-Video-Instruct @ 7b375e1b model.safetensors (1.9 GiB) fetched via hf-mirror; ONNX variants not needed.
+- Task score is diagnostic only; this episode is not a formal evaluation result.

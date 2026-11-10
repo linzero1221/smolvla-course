@@ -47,7 +47,7 @@ PY
 | 已见物体 | `alphabet_soup`、`cream_cheese`、`salad_dressing` | 选取三项任务的全部合格示范轨迹微调。仿真中另外指定初始状态用于验证和测试。 |
 | 未见物体 | `bbq_sauce`、`chocolate_pudding` | 这两项任务的轨迹、目标和干扰物身份均参与划分审计，两个留出物体都不能出现在训练场景中。用原版仿真场景做正式评估。 |
 
-拟实现 `scripts/prepare_data.py --config configs/experiment.json`，步骤如下。
+已实现 `scripts/prepare_data.py --config configs/experiment.json`（2026-11-10 跑通），步骤如下。
 
 1. 用 `bddl_stem` 匹配当前仿真器里的 `task_id` 和原始英文指令。再用原始指令定位数据集任务，对照任务文本、轨迹样例和 BDDL。仿真 `task_id` 和数据集 `task_index` 分别记录。若匹配存在歧义，先查清再生成划分。
 2. 导出 `data/task_map.csv` 和 `data/object_audit.csv`。物体审计以 BDDL 中的 `:objects` 为主，核对已见场景里两个留出物体均未出现。每个训练任务抽看至少三条轨迹的首帧和抓取段，确认目标和干扰物与任务定义相符。
@@ -60,7 +60,7 @@ PY
 
 **起始参数。**以 [实验配置](../configs/experiment.json) 为准。训练种子 42，LoRA `r=32`、`alpha=64`，batch size 1，学习率 `1e-3` 降到 `1e-4`。试跑 200 步，首轮正式训练 20k 步，每 5k 步保存一次。记录实际更新的模块和可训练参数量。 [官方 SmolVLA LoRA 示例](https://huggingface.co/docs/lerobot/v0.6.1/en/peft_training)
 
-拟实现 `scripts/train.sh`。下列是供该脚本封装的上游 CLI 命令模板。先完成第 3 节的数据导出，并令 `MODEL_REVISION` 等于已记录的基础权重 SHA。正式 run 的输出路径应是尚未使用的新目录。
+已实现 `scripts/train.sh`（pilot / formal 两种模式，参数从实验配置读取）。下列是供该脚本封装的上游 CLI 命令模板。先完成第 3 节的数据导出，并令 `MODEL_REVISION` 等于已记录的基础权重 SHA。正式 run 的输出路径应是尚未使用的新目录。
 
 ```bash
 BASE_MODEL_DIR="$PWD/data/smolvla_base"
@@ -92,7 +92,7 @@ lerobot-train \
 
 ## 5. 正式评测、记录与分析
 
-拟实现 `scripts/evaluate.py --config configs/experiment.json --checkpoint <checkpoint>`。复用 LeRobot 的策略和环境处理器。对每个回合显式加载对应的固定初始状态并重置策略动作队列。在同义改写组只覆盖传入策略的任务文本，原任务、环境成功谓词和动作上限沿用原始任务。沿用官方仿真器终止设置，观测尺寸固定为 256×256，控制模式为相对动作，每次推理执行 10 个动作步。 [LIBERO 环境与评估配置](https://huggingface.co/docs/lerobot/v0.6.1/en/libero) · [LeRobot 环境源代码](https://github.com/huggingface/lerobot/blob/v0.6.1/src/lerobot/envs/libero.py)
+已实现 `scripts/evaluate.py --config configs/experiment.json --checkpoint <checkpoint>`（含 `--validation` 选模模式）。复用 LeRobot 的策略和环境处理器。对每个回合显式加载对应的固定初始状态并重置策略动作队列。在同义改写组只覆盖传入策略的任务文本，原任务、环境成功谓词和动作上限沿用原始任务。沿用官方仿真器终止设置，观测尺寸固定为 256×256，控制模式为相对动作，每次推理执行 10 个动作步。 [LIBERO 环境与评估配置](https://huggingface.co/docs/lerobot/v0.6.1/en/libero) · [LeRobot 环境源代码](https://github.com/huggingface/lerobot/blob/v0.6.1/src/lerobot/envs/libero.py)
 
 | 条件 ID | 测试内容 | 回合数 |
 |---|---|---:|
@@ -102,7 +102,7 @@ lerobot-train \
 
 原句与改写按 `(task_id, init_state_id)` 配对，推理种子一致。逐回合输出 `outputs/eval/episodes.csv`，记录 `run_id,checkpoint,condition,task_id,object,init_state_id,prompt_id,prompt,seed,status,success,steps,video_path`。环境或推理异常单列记录，排查后对同一个回合键补跑。任务超时按任务失败计入结果。最终检查三个条件的完整回合数为 30、60、20，回合键唯一且无未处理异常。
 
-拟实现 `scripts/summarize.py` 输出 `summary.csv`、训练 loss 曲线、三组成功率柱状图和语言配对结果表。成功率按 `成功回合数 / 有效回合数` 计算，结果表同时给出分子和分母。改写效应报告每种改写相对原句的百分点变化，以及配对中由成功变失败和由失败变成功的次数。未见物体逐项报告，讨论目标类型和干扰物布局同时变化带来的影响。未见仅指本项目微调数据。任务目标区位置较固定，改写成功也可能来自对视觉布局的利用。
+已实现 `scripts/summarize.py` 输出 `summary.csv`、训练 loss 曲线、三组成功率柱状图和语言配对结果表。成功率按 `成功回合数 / 有效回合数` 计算，结果表同时给出分子和分母。改写效应报告每种改写相对原句的百分点变化，以及配对中由成功变失败和由失败变成功的次数。未见物体逐项报告，讨论目标类型和干扰物布局同时变化带来的影响。未见仅指本项目微调数据。任务目标区位置较固定，改写成功也可能来自对视觉布局的利用。
 
 从视频中选 1 个成功和 2 个代表性失败，标注抓错物体、抓取滑落、未正确入篮或超时等现象。对同一个 checkpoint 的性能与显存结果做汇总。只有一个训练种子时，讨论结论限于该次训练和已选任务。
 
@@ -119,7 +119,7 @@ lerobot-train \
 | 第 7–8 天 | 全组撰写报告、制作 PPT、清理复现流程，补齐截图 | 课程报告、PPT 初稿、代码包与运行证据 |
 | 第 9 天 | 在干净环境检查复现入口，做一次计时彩排 | 可交版本和 15 分钟讲稿 |
 
-正式代码包计划提供 `bash reproduce.sh --mode smoke` 和 `bash reproduce.sh --mode full`。前者运行小规模自训与评估闭环，后者串联数据准备、正式训练、checkpoint 选择、测试与绘图。当前可用的环境检查入口为 `bash scripts/smoke_eval.sh`。
+已实现 `scripts/reproduce.sh --mode smoke` 和 `--mode full`。前者运行小规模自训与评估闭环，后者串联数据准备、正式训练、checkpoint 选择、测试与绘图。环境检查入口为 `bash scripts/smoke_eval.sh`，单回合验收产物在 `outputs/smoke/20261110T080108Z-355/`。
 
 ## 7. 课程交付与汇报要求
 

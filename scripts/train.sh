@@ -90,12 +90,16 @@ fi
 
 # The LoRA adapter and the normalization processors are small; keep the base
 # weights out of the output directory to avoid duplicating ~2 GB per run.
-mkdir -p "$output_dir"
+# lerobot-train refuses to write into an existing directory, so the training
+# directory is created by it; the console log lives next to it.
+log_file="${output_dir}.log"
 
 lerobot-train \
     --policy.path="$base_model_dir" \
     --policy.device=cuda \
     --policy.push_to_hub=false \
+    --policy.input_features=null \
+    --policy.output_features=null \
     --policy.optimizer_lr="$(read_cfg training.learning_rate)" \
     --policy.scheduler_decay_lr="$(read_cfg training.final_learning_rate)" \
     --policy.scheduler_warmup_steps="$warmup" \
@@ -103,6 +107,7 @@ lerobot-train \
     --dataset.repo_id="$train_repo_id" \
     --dataset.root="$dataset_root" \
     --dataset.video_backend="$(read_cfg dataset.video_backend)" \
+    --dataset.use_imagenet_stats=false \
     --peft.method_type="$(read_cfg training.method)" \
     --peft.r="$rank" \
     --peft.lora_alpha="$alpha" \
@@ -114,6 +119,6 @@ lerobot-train \
     --log_freq="$log_freq" \
     --num_workers=2 \
     --wandb.enable=false \
-    --output_dir="$output_dir" 2>&1 | tee "$output_dir/train.log"
+    --output_dir="$output_dir" 2>&1 | tee "$log_file"
 
 printf '\nRun finished: %s\n' "$output_dir"

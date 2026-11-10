@@ -216,6 +216,7 @@ def main() -> int:
                 task_id=task_id,
                 task_suite_name=config["dataset"]["suite"],
                 camera_name="agentview_image,robot0_eye_in_hand_image",
+                obs_type="pixels_agent_pos",
                 observation_width=width,
                 observation_height=height,
                 init_states=True,
@@ -232,8 +233,16 @@ def main() -> int:
                 if not args.no_video:
                     frames.append(env.render())
                 for step in range(env._max_episode_steps):
+                    # A single (non-vectorised) env returns unbatched observations;
+                    # add the batch axis that the LIBERO processor and policy expect.
                     batch = preprocess_observation(
-                        {"pixels": observation["pixels"], "robot_state": observation["robot_state"]}
+                        {
+                            "pixels": {key: value[None] for key, value in observation["pixels"].items()},
+                            "robot_state": {
+                                key: {name: value[None] for name, value in group.items()}
+                                for key, group in observation["robot_state"].items()
+                            },
+                        }
                     )
                     batch["task"] = [item["prompt"]]
                     batch = env_preprocessor(batch)

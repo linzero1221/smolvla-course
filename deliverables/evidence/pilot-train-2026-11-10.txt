@@ -1,0 +1,33 @@
+Pilot training record (200 steps)
+Date: 2026-11-10
+Command: bash scripts/train.sh pilot
+Output: outputs/train/pilot_s42
+Base: lerobot/smolvla_base @ 5e8d12a6e2975b0e5e5fce7c8caf47c371d257b6 (data/smolvla_base)
+Dataset: data/libero_object_train @ 136 episodes / 19445 frames / 3 tasks
+Config: LoRA r=32 alpha=64, batch 1, lr 1e-3 -> 1e-4, warmup 20, decay 200, seed 42
+
+Result:
+- 200/200 steps completed in 28 s (8.65 step/s average after warm-up)
+- loss: step 50 = 2.246, step 100 = 1.352, step 150 = 1.117, step 200 = 0.973
+- grad norm fell from 7.34 to 2.90; learning rate ended at 1.4e-04
+- PyTorch reported peak mem_gb = 1.09 (torch allocated); GPU total while idle after run = 1122 MiB
+- checkpoint written: checkpoints/000200 (adapter_model.safetensors 5.95 MB,
+  adapter_config.json r=32 alpha=64, target modules lm_expert q/v_proj +
+  state_proj/action_in_proj/action_out_proj/action_time_mlp_*)
+- training log CSV: outputs/train/pilot_s42/training_log.csv (4 rows)
+
+Checkpoint reload check:
+- python scripts/evaluate.py --checkpoint outputs/train/pilot_s42/checkpoints/000200
+  --conditions seen_original --max-episodes 1 --output-dir outputs/eval/reload_check
+- Adapter and normalization processors loaded; one full 280-step LIBERO episode ran
+  to timeout (success=false), which is expected for a 200-step trial model.
+- Reload output: outputs/eval/reload_check/pilot_s42_000200/episodes.csv
+
+Notes for the formal run:
+- train.sh needed --dataset.use_imagenet_stats=false because the exported dataset
+  has no image statistics and SmolVLA normalizes images with IDENTITY anyway.
+- train.sh needed --policy.input_features=null --policy.output_features=null so the
+  dataset's camera names (image/image2) override the base checkpoint's 3-camera config.
+- lerobot-train refuses to write into an existing output directory, so train.sh now
+  writes its console log next to the run directory (outputs/train/<run>.log).
+- Estimated 20k-step formal run at this throughput: ~39 min plus checkpoint writes.

@@ -67,6 +67,13 @@ def main() -> int:
         print(f"error: no training rows parsed from {args.log}", file=sys.stderr)
         return 1
 
+    # The console log interleaves tqdm carriage returns, so one INFO line can be
+    # captured more than once. Keep the last record per step.
+    deduped = {}
+    for row in rows:
+        deduped[row["step"]] = row
+    rows = [deduped[step] for step in sorted(deduped)]
+
     with output.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=["step", "loss", "learning_rate", "wall_time_s"])
         writer.writeheader()

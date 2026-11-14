@@ -201,14 +201,17 @@ def main() -> int:
     # 5 Training -----------------------------------------------------------
     slide = deck.slides.add_slide(blank)
     header(slide, "训练过程", "20,000 步，约 41 分钟，8.4 步/秒，显存 1.09 GB")
-    picture(slide, EVIDENCE / "formal_loss_20k.png", 1.6, 3.6, 17.5)
-    bullets(slide, 20.2, 4.2, 12, 10, [
-        "200 步试跑：28 秒，loss 2.25→0.97",
-        "正式：loss 2.96→0.503（20k 步）",
+    picture(slide, EVIDENCE / "formal_loss_20k.png", 1.2, 3.7, 15.0)
+    bullets(slide, 1.4, 13.4, 15.0, 3.6, [
+        "200 步试跑 28 秒，loss 2.25→0.97",
+        "正式 loss 2.96→0.503",
+    ], 12)
+    picture(slide, EVIDENCE / "screenshot_training_progress.png", 17.0, 3.9, 15.6)
+    bullets(slide, 17.0, 12.6, 15.6, 4.6, [
+        "终端进度条：loss / 学习率 / 显存 / 步速",
         "checkpoint：5k / 10k / 15k / 20k",
-        "两段训练：首次到 ~11.3k 暂停，从 10k 续训",
-        "loss 与闭环成功率不同步，必须用验证状态选模",
-    ], 14)
+        "loss 与闭环成功率不同步，需用验证状态选模",
+    ], 11)
 
     # 6 Checkpoint selection ----------------------------------------------
     slide = deck.slides.add_slide(blank)
@@ -235,6 +238,10 @@ def main() -> int:
         ["未见原句", f"{summary['unseen_original']['successes']}/{summary['unseen_original']['episodes']}", "5.0%"],
     ], 1.8, 4.2, 13, 6.4, 16)
     picture(slide, EVIDENCE / "formal_success_by_condition.png", 16.2, 3.6, 15.8)
+    picture(slide, EVIDENCE / "screenshot_simulation_success.png", 3.0, 10.6, 14.5)
+    textbox(slide, 18.2, 10.9, 13, 1.2, "仿真回放：salad_dressing，状态 9，121 步成功", 12, False, GREY)
+    textbox(slide, 18.2, 12.4, 13, 4,
+            "左：第三人称视角　右：手腕相机\n逐回合由环境判定成功，超时计失败", 12, False, GREY)
     footer(slide, 7, 13)
 
     # 8 Per-object ---------------------------------------------------------

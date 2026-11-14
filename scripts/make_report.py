@@ -355,6 +355,18 @@ def main() -> int:
     )
     add_figure(document, EVIDENCE / "formal_loss_20k.png", "图 1  SmolVLA LoRA 训练 loss（50–20,000 步）。")
 
+    heading(document, "3.1.1  运行记录截图", 2)
+    body(
+        document,
+        "除文本日志外，保留了三类真实屏幕截图，作为环境与运行过程的可视证据："
+        "(1) 终端中的 nvidia-smi、CUDA 张量自检与组件版本；(2) 训练窗口中的 tqdm 进度条、每 50 步的 loss/学习率/显存日志，"
+        "以及训练结束后的 GPU 状态；(3) 仿真窗口中的双相机实时画面与逐回合成功判定。",
+    )
+    add_figure(document, EVIDENCE / "screenshot_environment.png", "图 2  环境验证截图：nvidia-smi、CUDA/PyTorch 自检与依赖版本。", width_cm=15.5)
+    add_figure(document, EVIDENCE / "screenshot_training_progress.png", "图 3  训练进度截图：300 步演示运行，含进度条、loss、学习率与显存。", width_cm=15.5)
+    add_figure(document, EVIDENCE / "screenshot_simulation_success.png", "图 4  仿真运行截图（成功）：salad_dressing，初始状态 9，121 步完成。", width_cm=13.5)
+    add_figure(document, EVIDENCE / "screenshot_simulation.png", "图 5  仿真运行截图（失败）：alphabet_soup，初始状态 5，280 步超时。", width_cm=13.5)
+
     heading(document, "3.2  checkpoint 选择", 2)
     add_table(
         document,
@@ -384,7 +396,7 @@ def main() -> int:
         ],
         "表 5  三组正式评测的成功率。分母为全部有效回合，超时计为失败。",
     )
-    add_figure(document, EVIDENCE / "formal_success_by_condition.png", "图 2  三个条件的闭环成功率。")
+    add_figure(document, EVIDENCE / "formal_success_by_condition.png", "图 6  三个条件的闭环成功率。")
 
     add_table(
         document,
@@ -424,7 +436,7 @@ def main() -> int:
         f"74 个失败回合全部跑满 280 步。典型失败可归为三类：目标物体定位错误（机械臂抓向相邻物体）、"
         "抓取后未能正确放入篮子、以及在改写提示下完全未接近目标（见回放视频）。",
     )
-    add_figure(document, EVIDENCE / "formal_success_example.png", "图 3  成功回合示例：机械臂将 cream cheese 放入篮子。", width_cm=9.5)
+    add_figure(document, EVIDENCE / "formal_success_example.png", "图 7  成功回合示例：机械臂将 cream cheese 放入篮子。", width_cm=9.5)
 
     # Discussion -------------------------------------------------------------
     heading(document, "4  分析讨论", 1)
